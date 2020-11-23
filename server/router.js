@@ -11,9 +11,9 @@ const router = (app) => {
   app.get('/logout', mid.requiresLogin, controllers.Account.logout);
   app.get('/accountPage', mid.requiresLogin, controllers.Character.accountPage);
   app.post('/makeCharacter', mid.requiresLogin, controllers.Character.make);
-  app.post('/makeParty',mid.requiresLogin, controllers.Party.makeParty);
-  app.get('/party',mid.requiresLogin, controllers.Party.partyPage);
-  app.get('/getParties',mid.requiresLogin, controllers.Party.getParties);
+  app.post('/makeParty', mid.requiresLogin, controllers.Party.makeParty);
+  app.get('/party', mid.requiresLogin, controllers.Party.partyPage);
+  app.get('/getParties', mid.requiresLogin, controllers.Party.getParties);
   app.get('/', mid.requiresSecure, mid.requiresLogout, controllers.Account.loginPage);
 };
 module.exports = router;
