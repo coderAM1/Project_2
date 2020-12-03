@@ -14,6 +14,11 @@ const router = (app) => {
   app.post('/makeParty', mid.requiresLogin, controllers.Party.makeParty);
   app.get('/party', mid.requiresLogin, controllers.Party.partyPage);
   app.get('/getParties', mid.requiresLogin, controllers.Party.getParties);
+  app.get('/getPartiesContent', mid.requiresSecure, controllers.Party.getPartiesByContent);
+  app.get('/getPartiesDatacenter', mid.requiresLogin, controllers.Party.getPartiesByDatacenter);
+  app.get('/getPartiesCharacter', mid.requiresLogin, controllers.Party.getPartiesByCharacter);
   app.get('/', mid.requiresSecure, mid.requiresLogout, controllers.Account.loginPage);
+  app.delete('/removeParty', mid.requiresLogin, controllers.Party.deleteParty);
+  app.post('/changePassword', mid.requiresLogin, controllers.Account.changePassword);
 };
 module.exports = router;

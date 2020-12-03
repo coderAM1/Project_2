@@ -1,7 +1,7 @@
 const models = require('../models');
 
 const { Character } = models;
-
+// gets the account page and returns characters from the user
 const accountPage = (req, res) => {
   Character.CharacterModel.findByOwner(req.session.account._id, (err, docs) => {
     if (err) {
@@ -11,12 +11,11 @@ const accountPage = (req, res) => {
     return res.render('app', { csrfToken: req.csrfToken(), Characters: docs });
   });
 };
-
+// creates a character requested
 const makeCharacter = (req, res) => {
   if (!req.body.name || !req.body.role || !req.body.itemLevel || !req.body.dataCenter) {
     return res.status(400).json({ error: 'All fields are required' });
   }
-
   const CharacterData = {
     name: req.body.name,
     role: req.body.role,
@@ -40,7 +39,7 @@ const makeCharacter = (req, res) => {
   });
   return characterPromise;
 };
-
+// gets the characters from a request
 const getCharacters = (request, response) => {
   const req = request;
   const res = response;
@@ -53,9 +52,8 @@ const getCharacters = (request, response) => {
     return res.json({ characters: docs });
   });
 };
-
+// removes a character from a request
 const removeCharacter = (request, response) => {
-  console.log('does this happen');
   const req = request;
   const res = response;
   return Character.CharacterModel.deleteCharacter(req.session.account._id, req.body.name, (err, docs) => {
@@ -66,7 +64,7 @@ const removeCharacter = (request, response) => {
     return res.json({ characters: docs });
   });
 };
-
+// exports
 module.exports.accountPage = accountPage;
 module.exports.getCharacters = getCharacters;
 module.exports.removeCharacter = removeCharacter;

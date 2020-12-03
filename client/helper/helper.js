@@ -1,10 +1,15 @@
+//handles error and displays them to the errorMes div
 const handleError = (message) => {
-};
+    ReactDOM.render(
+      <h3>{message}</h3>,document.querySelector("#errorMes")
+    );
+  }
+//redirects the page
 
 const redirect = (response) => {
     window.location = response.redirect;
 };
-
+//send ajax method
 const sendAjax = (type,action,data,success) => {
     $.ajax({
         cache: false,

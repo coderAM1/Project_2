@@ -11,10 +11,19 @@
 </head>
 <body>
   <nav><a href="/login"><img id="logo" src="/assets/img/face.png" alt="face logo"/></a>
-    <div class="navlink"><a href="/logout">Log out</a><a href="/accountPage">Account Page</a></div>
+    <div class="navlink"><a href="/accountPage">Account Page</a><a href="/logout">Log out</a></div>
   </nav>
-  <section id="makeParty">
+  <nav>
+    <div class="navlink2">
+      <a href="/GetPartyDataCenter" id="dataCenterButton">Get by Datacenter</a>
+      <a href="/getPartyContent" id="contentButton">Get by Content</a>
+      <a href="/GetPartyCharacter" id="characterButton">Get by Character</a>
+    </div>
+  </nav>
+  <section id="getParty">
   </section>
+  <div id="errorMes">
+  </div>
   <section id="parties">
   </section>
   <script src="/assets/partybundle.js"></script>

@@ -11,12 +11,21 @@
 </head>
 <body>
   <nav><a href="/login"><img id="logo" src="/assets/img/face.png" alt="face logo"/></a>
-    <div class="navlink"><a href="/logout">Log out</a><a href="/party">Party Finder</a></div>
+    <div class="navlink"><a href="/party">Party Finder</a><a href="/logout">Log out</a></div>
   </nav>
-  <section id="makeCharacter">
-  </section>
-  <section id="removeCharacter">
-  </section>
+  <nav>
+    <div class="navlink2"><a id="createCharacters" href="/characters">Characters</a><a id="createdParties" href="/createdParties">Created Parties</a><a id="changePass" href="/changePassword">Change Password</a></div>
+  </nav>
+  <div id="formsFlex">
+    <section id="makeCharacter">
+    </section>
+    <section id="removeCharacter">
+      </section>
+  </div>
+  
+  
+  <div id="errorMes">
+  </div>
   <section id="characters">
   </section>
   <script src="/assets/bundle.js"></script>

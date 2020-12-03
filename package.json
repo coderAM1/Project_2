@@ -8,9 +8,9 @@
   "description": "Project 2",
   "main": "./server/app.js",
   "scripts": {
-    "buildLoginBundle": "babel ./client/login ./client/helper --presets @babel/preset-react --out-file ./hosted/loginBundle.js",
-    "buildAppBundle": "babel ./client/app ./client/helper --presets @babel/preset-react --out-file ./hosted/bundle.js",
-    "buildPartyBundle": "babel ./client/party ./client/helper --presets @babel/preset-react --out-file ./hosted/partybundle.js",
+    "buildLoginBundle": "babel ./client/helper ./client/login  --presets @babel/preset-react --out-file ./hosted/loginBundle.js",
+    "buildAppBundle": "babel ./client/helper ./client/app  --presets @babel/preset-react --out-file ./hosted/bundle.js",
+    "buildPartyBundle": "babel ./client/helper ./client/party  --presets @babel/preset-react --out-file ./hosted/partybundle.js",
     "build": "npm run buildLoginBundle && npm run buildAppBundle && npm run buildPartyBundle",
     "watchLoginBundle": "babel --watch ./client/login ./client/helper --presets @babel/preset-react --out-file ./hosted/loginBundle.js",
     "watchAppBundle": "babel --watch ./client/app ./client/helper --presets @babel/preset-react --out-file ./hosted/bundle.js",

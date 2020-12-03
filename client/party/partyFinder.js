@@ -1,45 +1,46 @@
 
-
+//handles ajax call for getting the parties for the first two tabs
 const handleParty = (e) => {
     e.preventDefault();
-    if($("#nameAndDatacenter").val() == ''){
-        console.log('choose a character');
+    handleError("");
+    sendAjax('GET', $("#partyForm2").attr("action"), $("#partyForm2").serialize(), (data) => {
+        ReactDOM.render(
+            <PartyList parties={data.parties} />,document.querySelector("#parties")
+        );
+    });
+    return false;
+};
+//handlesthe tab with name same as above but needs to account for someone not filling out the name
+const handlePartyName = (e) => {
+    e.preventDefault();
+    handleError("");
+
+    if($("#characterName").val() == '' ){
+        handleError("Name is required");
         return false;
     }
-    sendAjax('POST', $("#PartyForm").attr("action"),  $("#PartyForm").serialize(), function() {
-        loadPartiesFromServer();
+    sendAjax('GET', $("#partyForm2").attr("action"), $("#partyForm2").serialize(), (data) => {
+        ReactDOM.render(
+            <PartyList parties={data.parties} />,document.querySelector("#parties")
+        );
     });
     return false;
 };
 
-const handleChange = (e) => {
-    return false;
-};
-
-const PartyForm = (props) => {
-    if(props.characters.length === 0) {
-        return(
-            <div className="partyForm">
-                <h3 className="emptyCharacter">Need To Create a Character</h3>
-            </div>
-        );
-    }
-    const CharacterNodesSelect = props.characters.map(function(character,index) {
-        return (
-            <option value={character.name + "*|*" + character.dataCenter} key={index}>{character.name} dataCenter: {character.dataCenter}</option>
-        );
-    });
+//form for the content get 
+const PartyFormContent = (props) => {
     return (
-        <form id="PartyForm" name="PartyForm"
+        <form id="partyForm2" name="PartyForm"
             onSubmit={handleParty}
-            action="/makeParty"
-            method="/POST"
+            action="/getPartiesContent"
+            method="GET"
             className="PartyForm"
         >
-            <label htmlFor="nameDatacenter">Character and Datacenter</label>
-            <select id="nameAndDatacenter" name="nameDatacenter" >
-                {CharacterNodesSelect}
-                
+            <label htmlFor="dataCenter">Datacenter: </label>
+            <select id="characterDataCenter" name="dataCenter">
+                <option value="primal">Primal</option>
+                <option value="aether">Aether</option>
+                <option value="crystal">Crystal</option>
             </select>
             <label htmlFor="content">Content: </label>
             <select id="partyContent" name="content">
@@ -52,16 +53,48 @@ const PartyForm = (props) => {
                 <option value="e7">E7</option>
                 <option value="e8">E8</option>
             </select>
-            <label htmlFor="raidDate">Date For Raid: </label>
-            <input id="raidDate" type="date" name="date" defaultValue="2020-11-11"/>
-            <label htmlFor="raidTime">Raid Time: </label>
-            <input id="raidTime" type="time" name="raidTime" defaultValue="12:00"/>
             <input type="hidden" name="_csrf" value={props.csrf} />
-            <input className="makePartySubmit" type="submit" value="Make Party"/>
+            <input className="makePartySubmit" type="submit" value="Get Party"/>
         </form>
     );
 };
-
+//form for getting parties from the datacenter
+const PartyFormDatacenter = (props) => {
+    return (
+        <form id="partyForm2" name="PartyForm"
+            onSubmit={handleParty}
+            action="/getPartiesDatacenter"
+            method="GET"
+            className="PartyForm"
+        >
+            <label htmlFor="dataCenter">Datacenter: </label>
+            <select id="characterDataCenter" name="dataCenter">
+                <option value="primal">Primal</option>
+                <option value="aether">Aether</option>
+                <option value="crystal">Crystal</option>
+            </select>
+            <input type="hidden" name="_csrf" value={props.csrf} />
+            <input className="makePartySubmit" type="submit" value="Get Party"/>
+        </form>
+    );
+};
+//form for getting party by a characters name
+const PartyFormCharacter = (props) => {
+    return (
+        <form id="partyForm2" name="PartyForm"
+            onSubmit={handleParty}
+            action="/getPartiesCharacter"
+            method="GET"
+            className="PartyForm"
+        >
+            <label htmlFor="characterName">Character name: </label>
+            <input id="characterName" type="text" name="character" placeholder="Character Name"/>
+            <input type="hidden" name="_csrf" value={props.csrf} />
+            <input className="makePartySubmit" type="submit" value="Get Party"/>
+        </form>
+    );
+};
+//created the html elements for the parties
 const PartyList = function(props) {
     if(props.parties.length === 0) {
         return(
@@ -89,41 +122,70 @@ const PartyList = function(props) {
         </div>
     );
 };
-
-const loadCharactersFromServer= (csrf) => {
-    sendAjax('GET', '/getCharacters', null, (data) => {
-        ReactDOM.render(
-            <PartyForm characters={data.characters} csrf={csrf} />,document.querySelector("#makeParty")
-        );
-    });
-};
-
+//loading the parties from the server
 const loadPartiesFromServer = () => {
-    sendAjax('GET', '/getParties', null, (data) => {
+    ReactDOM.render(
+        <PartyList parties={[]}/>, document.querySelector("#parties")
+    );
+    sendAjax('GET', $("#partyForm2").attr("action"), $("#partyForm2").serialize(), (data) => {
         ReactDOM.render(
             <PartyList parties={data.parties} />,document.querySelector("#parties")
         );
     });
 };
-
-const setup = function(csrf) {
+//sets up the datacenter tab
+const setupDatacenterFind = (csrf) => {
     ReactDOM.render(
-        <PartyForm csrf={csrf} characters={[]}/>, document.querySelector("#makeParty")
+        <PartyFormDatacenter csrf={csrf}/>, document.querySelector("#getParty")
     );
-    ReactDOM.render(
-        <PartyList parties={[]}/>, document.querySelector("#parties")
-    );
-    loadCharactersFromServer(csrf);
     loadPartiesFromServer();
-    
 };
-
+//sets up the content tab
+const setupContentFind = (csrf) => {
+    ReactDOM.render(
+        <PartyFormContent csrf={csrf}/>, document.querySelector("#getParty")
+    );
+    loadPartiesFromServer();
+};
+//sets up the character tab
+const setupCharacterFind = (csrf) => {
+    ReactDOM.render(
+        <PartyFormCharacter csrf={csrf}/>, document.querySelector("#getParty")
+    );
+    loadPartiesFromServer();
+};
+//sets up the page
+const setup = function(csrf) {
+    const dataCenterButton = document.querySelector("#dataCenterButton");
+    const contentButton = document.querySelector("#contentButton");
+    const characterButton = document.querySelector("#characterButton");
+    dataCenterButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        handleError("");
+        setupDatacenterFind(csrf);
+        return false;
+    });
+    contentButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        handleError("");
+        setupContentFind(csrf);
+        return false;
+    });
+    characterButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        handleError("");
+        setupCharacterFind(csrf);
+        return false;
+    });
+    setupDatacenterFind(csrf);
+};
+//gets the csrf token
 const getToken = () => {
     sendAjax('GET', '/getToken', null, (result) => {
         setup(result.csrfToken);
     });
 };
-
+//called with page is loaded
 $(document).ready(function() {
     getToken();
 });

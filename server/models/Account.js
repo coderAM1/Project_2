@@ -2,12 +2,12 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
-
+mongoose.set('useFindAndModify', false);
 let AccountModel = {};
 const iterations = 10000;
 const saltLength = 64;
 const keyLength = 64;
-
+// shcema for account
 const AccountSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -35,7 +35,7 @@ AccountSchema.statics.toAPI = (doc) => ({
   username: doc.username,
   _id: doc._id,
 });
-
+// validates password
 const validatePassword = (doc, password, callback) => {
   const pass = doc.password;
 
@@ -46,7 +46,7 @@ const validatePassword = (doc, password, callback) => {
     return callback(true);
   });
 };
-
+// finds by username
 AccountSchema.statics.findByUsername = (name, callback) => {
   const search = {
     username: name,
@@ -54,13 +54,13 @@ AccountSchema.statics.findByUsername = (name, callback) => {
 
   return AccountModel.findOne(search, callback);
 };
-
+// generates hash using password
 AccountSchema.statics.generateHash = (password, callback) => {
   const salt = crypto.randomBytes(saltLength);
 
   crypto.pbkdf2(password, salt, iterations, keyLength, 'RSA-SHA512', (err, hash) => callback(salt, hash.toString('hex')));
 };
-
+// authenticates user
 AccountSchema.statics.authenticate = (username, password, callback) => {
   AccountModel.findByUsername(username, (err, doc) => {
     if (err) {
@@ -80,8 +80,22 @@ AccountSchema.statics.authenticate = (username, password, callback) => {
     });
   });
 };
+// change password method
+AccountSchema.statics.changePassword = (id, salt, hash, callback) => {
+  const updateData = {
+    password: hash,
+    salt,
+  };
+  AccountModel.findByIdAndUpdate(id, updateData, (err, result) => {
+    if (err) {
+      return callback(err);
+    }
+    return result;
+  });
+  return callback();
+};
 
 AccountModel = mongoose.model('Account', AccountSchema);
-
+// exports
 module.exports.AccountModel = AccountModel;
 module.exports.AccountSchema = AccountSchema;

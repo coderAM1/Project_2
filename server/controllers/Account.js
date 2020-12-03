@@ -1,17 +1,18 @@
 // const { response } = require('express');
+// const { result } = require('underscore');
 const models = require('../models');
 
 const { Account } = models;
-
+// login page with sending the token
 const loginPage = (req, res) => {
   res.render('login', { csrfToken: req.csrfToken() });
 };
-
+// logs out the user and redirects to first page
 const logout = (req, res) => {
   req.session.destroy();
   res.redirect('/');
 };
-
+// login function
 const login = (request, response) => {
   const req = request;
   const res = response;
@@ -33,7 +34,7 @@ const login = (request, response) => {
     return res.json({ redirect: '/accountPage' });
   });
 };
-
+// signup function
 const signup = (request, response) => {
   const req = request;
   const res = response;
@@ -42,10 +43,10 @@ const signup = (request, response) => {
   req.body.pass = `${req.body.pass}`;
   req.body.pass2 = `${req.body.pass2}`;
   if (!req.body.username || !req.body.pass || !req.body.pass2) {
-    return res.status(400).json({ error: 'RAWR! All fields are required' });
+    return res.status(400).json({ error: 'All fields are required' });
   }
   if (req.body.pass !== req.body.pass2) {
-    return res.status(400).json({ error: 'RAWR! Passwords do not match' });
+    return res.status(400).json({ error: 'Passwords do not match' });
   }
 
   return Account.AccountModel.generateHash(req.body.pass, (salt, hash) => {
@@ -54,6 +55,7 @@ const signup = (request, response) => {
       salt,
       password: hash,
     };
+
     const newAccount = new Account.AccountModel(accountData);
     const savePromise = newAccount.save();
     savePromise.then(() => {
@@ -70,7 +72,26 @@ const signup = (request, response) => {
     });
   });
 };
+// changePassword function
+const changePassword = (request, response) => {
+  const req = request;
+  const res = response;
+  const id = req.session.account._id;
+  req.body.pass = `${req.body.pass}`;
+  req.body.pass2 = `${req.body.pass2}`;
+  if (!req.body.pass || !req.body.pass2) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+  if (req.body.pass !== req.body.pass2) {
+    return res.status(400).json({ error: 'Passwords do not match' });
+  }
 
+  return Account.AccountModel.generateHash(req.body.pass, (salt, hash) => Account.AccountModel.changePassword(id, salt, hash, (err) => {
+    if (err) return res.status(400).json({ error: 'An error occurred' });
+    return res.json({ message: 'success!' });
+  }));
+};
+// getting token function
 const getToken = (request, response) => {
   const req = request;
   const res = response;
@@ -80,9 +101,10 @@ const getToken = (request, response) => {
   };
   res.json(csrfJSON);
 };
-
+// exports
 module.exports.loginPage = loginPage;
 module.exports.login = login;
 module.exports.logout = logout;
 module.exports.signup = signup;
 module.exports.getToken = getToken;
+module.exports.changePassword = changePassword;

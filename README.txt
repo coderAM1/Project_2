@@ -1,4 +1,4 @@
 Sources for images:
-https://eu.finalfantasyxiv.com/shadowbringers/product
+https://www.solaguild.com/ffxiv
 
 Note: images are just placeholders until project is done

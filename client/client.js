@@ -1,5 +1,9 @@
+//I don't think this actually does anything anymore due to moving to react
 const handleError = (message) => {
-  $("#errorMessage").text(message);
+  console.log("does this happen");
+  ReactDOM.render(
+    <h3>{message}</h3>,document.querySelector("#errorMes")
+  );
 }
 
 const sendAjax = (action, data) => {

@@ -1,51 +1,56 @@
 "use strict";
 
+//handles ajax call for getting the parties for the first two tabs
 var handleParty = function handleParty(e) {
   e.preventDefault();
+  handleError("");
+  sendAjax('GET', $("#partyForm2").attr("action"), $("#partyForm2").serialize(), function (data) {
+    ReactDOM.render( /*#__PURE__*/React.createElement(PartyList, {
+      parties: data.parties
+    }), document.querySelector("#parties"));
+  });
+  return false;
+}; //handlesthe tab with name same as above but needs to account for someone not filling out the name
 
-  if ($("#nameAndDatacenter").val() == '') {
-    console.log('choose a character');
+
+var handlePartyName = function handlePartyName(e) {
+  e.preventDefault();
+  handleError("");
+
+  if ($("#characterName").val() == '') {
+    handleError("Name is required");
     return false;
   }
 
-  sendAjax('POST', $("#PartyForm").attr("action"), $("#PartyForm").serialize(), function () {
-    loadPartiesFromServer();
+  sendAjax('GET', $("#partyForm2").attr("action"), $("#partyForm2").serialize(), function (data) {
+    ReactDOM.render( /*#__PURE__*/React.createElement(PartyList, {
+      parties: data.parties
+    }), document.querySelector("#parties"));
   });
   return false;
-};
+}; //form for the content get 
 
-var handleChange = function handleChange(e) {
-  return false;
-};
 
-var PartyForm = function PartyForm(props) {
-  if (props.characters.length === 0) {
-    return /*#__PURE__*/React.createElement("div", {
-      className: "partyForm"
-    }, /*#__PURE__*/React.createElement("h3", {
-      className: "emptyCharacter"
-    }, "Need To Create a Character"));
-  }
-
-  var CharacterNodesSelect = props.characters.map(function (character, index) {
-    return /*#__PURE__*/React.createElement("option", {
-      value: character.name + "*|*" + character.dataCenter,
-      key: index
-    }, character.name, " dataCenter: ", character.dataCenter);
-  });
+var PartyFormContent = function PartyFormContent(props) {
   return /*#__PURE__*/React.createElement("form", {
-    id: "PartyForm",
+    id: "partyForm2",
     name: "PartyForm",
     onSubmit: handleParty,
-    action: "/makeParty",
-    method: "/POST",
+    action: "/getPartiesContent",
+    method: "GET",
     className: "PartyForm"
   }, /*#__PURE__*/React.createElement("label", {
-    htmlFor: "nameDatacenter"
-  }, "Character and Datacenter"), /*#__PURE__*/React.createElement("select", {
-    id: "nameAndDatacenter",
-    name: "nameDatacenter"
-  }, CharacterNodesSelect), /*#__PURE__*/React.createElement("label", {
+    htmlFor: "dataCenter"
+  }, "Datacenter: "), /*#__PURE__*/React.createElement("select", {
+    id: "characterDataCenter",
+    name: "dataCenter"
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "primal"
+  }, "Primal"), /*#__PURE__*/React.createElement("option", {
+    value: "aether"
+  }, "Aether"), /*#__PURE__*/React.createElement("option", {
+    value: "crystal"
+  }, "Crystal")), /*#__PURE__*/React.createElement("label", {
     htmlFor: "content"
   }, "Content: "), /*#__PURE__*/React.createElement("select", {
     id: "partyContent",
@@ -66,20 +71,64 @@ var PartyForm = function PartyForm(props) {
     value: "e7"
   }, "E7"), /*#__PURE__*/React.createElement("option", {
     value: "e8"
-  }, "E8")), /*#__PURE__*/React.createElement("label", {
-    htmlFor: "raidDate"
-  }, "Date For Raid: "), /*#__PURE__*/React.createElement("input", {
-    id: "raidDate",
-    type: "date",
-    name: "date",
-    defaultValue: "2020-11-11"
-  }), /*#__PURE__*/React.createElement("label", {
-    htmlFor: "raidTime"
-  }, "Raid Time: "), /*#__PURE__*/React.createElement("input", {
-    id: "raidTime",
-    type: "time",
-    name: "raidTime",
-    defaultValue: "12:00"
+  }, "E8")), /*#__PURE__*/React.createElement("input", {
+    type: "hidden",
+    name: "_csrf",
+    value: props.csrf
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "makePartySubmit",
+    type: "submit",
+    value: "Get Party"
+  }));
+}; //form for getting parties from the datacenter
+
+
+var PartyFormDatacenter = function PartyFormDatacenter(props) {
+  return /*#__PURE__*/React.createElement("form", {
+    id: "partyForm2",
+    name: "PartyForm",
+    onSubmit: handleParty,
+    action: "/getPartiesDatacenter",
+    method: "GET",
+    className: "PartyForm"
+  }, /*#__PURE__*/React.createElement("label", {
+    htmlFor: "dataCenter"
+  }, "Datacenter: "), /*#__PURE__*/React.createElement("select", {
+    id: "characterDataCenter",
+    name: "dataCenter"
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "primal"
+  }, "Primal"), /*#__PURE__*/React.createElement("option", {
+    value: "aether"
+  }, "Aether"), /*#__PURE__*/React.createElement("option", {
+    value: "crystal"
+  }, "Crystal")), /*#__PURE__*/React.createElement("input", {
+    type: "hidden",
+    name: "_csrf",
+    value: props.csrf
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "makePartySubmit",
+    type: "submit",
+    value: "Get Party"
+  }));
+}; //form for getting party by a characters name
+
+
+var PartyFormCharacter = function PartyFormCharacter(props) {
+  return /*#__PURE__*/React.createElement("form", {
+    id: "partyForm2",
+    name: "PartyForm",
+    onSubmit: handleParty,
+    action: "/getPartiesCharacter",
+    method: "GET",
+    className: "PartyForm"
+  }, /*#__PURE__*/React.createElement("label", {
+    htmlFor: "characterName"
+  }, "Character name: "), /*#__PURE__*/React.createElement("input", {
+    id: "characterName",
+    type: "text",
+    name: "character",
+    placeholder: "Character Name"
   }), /*#__PURE__*/React.createElement("input", {
     type: "hidden",
     name: "_csrf",
@@ -87,9 +136,10 @@ var PartyForm = function PartyForm(props) {
   }), /*#__PURE__*/React.createElement("input", {
     className: "makePartySubmit",
     type: "submit",
-    value: "Make Party"
+    value: "Get Party"
   }));
-};
+}; //created the html elements for the parties
+
 
 var PartyList = function PartyList(props) {
   if (props.parties.length === 0) {
@@ -119,53 +169,93 @@ var PartyList = function PartyList(props) {
   return /*#__PURE__*/React.createElement("div", {
     className: "partyList"
   }, PartyNodes);
-};
+}; //loading the parties from the server
 
-var loadCharactersFromServer = function loadCharactersFromServer(csrf) {
-  sendAjax('GET', '/getCharacters', null, function (data) {
-    ReactDOM.render( /*#__PURE__*/React.createElement(PartyForm, {
-      characters: data.characters,
-      csrf: csrf
-    }), document.querySelector("#makeParty"));
-  });
-};
 
 var loadPartiesFromServer = function loadPartiesFromServer() {
-  sendAjax('GET', '/getParties', null, function (data) {
+  ReactDOM.render( /*#__PURE__*/React.createElement(PartyList, {
+    parties: []
+  }), document.querySelector("#parties"));
+  sendAjax('GET', $("#partyForm2").attr("action"), $("#partyForm2").serialize(), function (data) {
     ReactDOM.render( /*#__PURE__*/React.createElement(PartyList, {
       parties: data.parties
     }), document.querySelector("#parties"));
   });
-};
+}; //sets up the datacenter tab
+
+
+var setupDatacenterFind = function setupDatacenterFind(csrf) {
+  ReactDOM.render( /*#__PURE__*/React.createElement(PartyFormDatacenter, {
+    csrf: csrf
+  }), document.querySelector("#getParty"));
+  loadPartiesFromServer();
+}; //sets up the content tab
+
+
+var setupContentFind = function setupContentFind(csrf) {
+  ReactDOM.render( /*#__PURE__*/React.createElement(PartyFormContent, {
+    csrf: csrf
+  }), document.querySelector("#getParty"));
+  loadPartiesFromServer();
+}; //sets up the character tab
+
+
+var setupCharacterFind = function setupCharacterFind(csrf) {
+  ReactDOM.render( /*#__PURE__*/React.createElement(PartyFormCharacter, {
+    csrf: csrf
+  }), document.querySelector("#getParty"));
+  loadPartiesFromServer();
+}; //sets up the page
+
 
 var setup = function setup(csrf) {
-  ReactDOM.render( /*#__PURE__*/React.createElement(PartyForm, {
-    csrf: csrf,
-    characters: []
-  }), document.querySelector("#makeParty"));
-  ReactDOM.render( /*#__PURE__*/React.createElement(PartyList, {
-    parties: []
-  }), document.querySelector("#parties"));
-  loadCharactersFromServer(csrf);
-  loadPartiesFromServer();
-};
+  var dataCenterButton = document.querySelector("#dataCenterButton");
+  var contentButton = document.querySelector("#contentButton");
+  var characterButton = document.querySelector("#characterButton");
+  dataCenterButton.addEventListener("click", function (e) {
+    e.preventDefault();
+    handleError("");
+    setupDatacenterFind(csrf);
+    return false;
+  });
+  contentButton.addEventListener("click", function (e) {
+    e.preventDefault();
+    handleError("");
+    setupContentFind(csrf);
+    return false;
+  });
+  characterButton.addEventListener("click", function (e) {
+    e.preventDefault();
+    handleError("");
+    setupCharacterFind(csrf);
+    return false;
+  });
+  setupDatacenterFind(csrf);
+}; //gets the csrf token
+
 
 var getToken = function getToken() {
   sendAjax('GET', '/getToken', null, function (result) {
     setup(result.csrfToken);
   });
-};
+}; //called with page is loaded
+
 
 $(document).ready(function () {
   getToken();
 });
 "use strict";
 
-var handleError = function handleError(message) {};
+//handles error and displays them to the errorMes div
+var handleError = function handleError(message) {
+  ReactDOM.render( /*#__PURE__*/React.createElement("h3", null, message), document.querySelector("#errorMes"));
+}; //redirects the page
+
 
 var redirect = function redirect(response) {
   window.location = response.redirect;
-};
+}; //send ajax method
+
 
 var sendAjax = function sendAjax(type, action, data, success) {
   $.ajax({
