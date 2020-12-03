@@ -85,6 +85,9 @@ nav:nth-child(1) {
     border-width: 10px;
     border-color: black;
     background-color: #444444;
+    justify-content: center;
+    align-content: center;
+    display: grid;
 }
 
 #contentControl{
@@ -151,6 +154,8 @@ nav:nth-child(1) {
     color: white;
     max-width: 50%;
     min-width: 24%;
+    display: flex;
+    flex-flow: column;
 }
 
 label {
@@ -232,7 +237,8 @@ select {
 }
 
 #errorMes {
-    font-size: 1.2em;
+    font-size: 2em;
+    background-color: #444444;
     font-weight: bold;
     color: red;
     font-style: italic;
